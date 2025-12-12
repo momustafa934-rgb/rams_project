@@ -6,9 +6,7 @@ from datetime import date
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-)
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 
 app = FastAPI()
 
@@ -29,34 +27,34 @@ def build_pdf(data: dict) -> bytes:
     story.append(Paragraph("<b>RISK ASSESSMENT & METHOD STATEMENT (RAMS)</b>", styles["Title"]))
     story.append(Spacer(1, 12))
 
-    details = [
+    table = Table([
         ["Company", data["company"]],
         ["Job title", data["job_title"]],
         ["Location", data["location"]],
         ["Date", data["job_date"]],
         ["Workers", data["workers"]],
         ["Supervisor", data["supervisor"]],
-    ]
+    ], colWidths=[150, 350])
 
-    table = Table(details, colWidths=[150, 350])
     table.setStyle(TableStyle([
         ("GRID", (0,0), (-1,-1), 0.5, colors.grey),
         ("FONTNAME", (0,0), (0,-1), "Helvetica-Bold"),
         ("PADDING", (0,0), (-1,-1), 6),
     ]))
+
     story.append(table)
     story.append(Spacer(1, 12))
 
     story.append(Paragraph("<b>Method Statement</b>", styles["Heading2"]))
-    for step in _lines(data["method_steps"]):
-        story.append(Paragraph(f"- {step}", styles["BodyText"]))
-    story.append(Spacer(1, 12))
+    for s in _lines(data["method_steps"]):
+        story.append(Paragraph(f"- {s}", styles["BodyText"]))
 
+    story.append(Spacer(1, 12))
     story.append(Paragraph("<b>Hazards & Controls</b>", styles["Heading2"]))
-    for hz in _lines(data["hazards"]):
-        story.append(Paragraph(f"- {hz}", styles["BodyText"]))
-    story.append(Spacer(1, 12))
+    for h in _lines(data["hazards"]):
+        story.append(Paragraph(f"- {h}", styles["BodyText"]))
 
+    story.append(Spacer(1, 12))
     story.append(Paragraph("<b>Disclaimer</b>", styles["Heading2"]))
     story.append(Paragraph(DISCLAIMER, styles["BodyText"]))
 
@@ -84,11 +82,16 @@ def home():
 
 <p>
   <a href="https://buy.stripe.com/4gM6oJda49hP9Ie8kh7Zu00" target="_blank">
-    <strong>Pay £25/month to generate RAMS</strong>
+    <strong>Pay £35 to generate RAMS (one-off)</strong>
   </a>
 </p>
 
-<p><em>Please complete payment before generating your RAMS.</em></p>
+<label>
+  <input type="checkbox" id="paidCheck">
+  I confirm I have paid £35
+</label>
+
+<br><br>
 
 <form method="post" action="/generate">
   <label>Company</label>
@@ -115,8 +118,18 @@ def home():
   <label>Hazards & controls (one per line)</label>
   <textarea name="hazards" rows="5"></textarea>
 
-  <button type="submit">Generate RAMS PDF</button>
+  <button type="submit" id="generateBtn" disabled>
+    Generate RAMS PDF
+  </button>
 </form>
+
+<script>
+  const check = document.getElementById("paidCheck");
+  const btn = document.getElementById("generateBtn");
+  check.addEventListener("change", () => {{
+    btn.disabled = !check.checked;
+  }});
+</script>
 
 </body>
 </html>
