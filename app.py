@@ -74,6 +74,7 @@ def home():
     body {{ font-family: Arial; max-width: 900px; margin: 40px auto; }}
     input, textarea {{ width: 100%; padding: 10px; margin-bottom: 15px; }}
     button {{ padding: 12px 20px; font-weight: bold; }}
+    .note {{ font-size: 0.95em; color: #444; }}
   </style>
 </head>
 <body>
@@ -84,6 +85,11 @@ def home():
   <a href="https://buy.stripe.com/4gM6oJda49hP9Ie8kh7Zu00" target="_blank">
     <strong>Pay £35 to generate RAMS (one-off)</strong>
   </a>
+</p>
+
+<p class="note">
+  £35 covers the generation of <strong>one RAMS document</strong>.  
+  A new payment is required for each additional RAMS.
 </p>
 
 <label>
@@ -122,6 +128,10 @@ def home():
     Generate RAMS PDF
   </button>
 </form>
+
+<p class="note">
+  Documents are generated for guidance only and must be reviewed before use.
+</p>
 
 <script>
   const check = document.getElementById("paidCheck");
@@ -163,3 +173,4 @@ def generate(
         media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=RAMS.pdf"}
     )
+
